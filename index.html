@@ -828,16 +828,31 @@ async function calcResult() {
         // -----------------------------------------------------
         // --- GOOGLE APPS SCRIPT SUBMISSION CODE ADDED HERE ---
         // -----------------------------------------------------
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbw78mAjw-LcRgpgH1VOrPn3k4be4jlgC_4Gt2gO3Ea9YGq5rG4tia-HjBJGEq2_KKCpLw/exec';
-        let submitData = new FormData();
-        submitData.append('Name', name);
-        submitData.append('Ideology', ideology);
-        submitData.append('Language', lang);
-        submitData.append('Tag', tag);
-        
-        fetch(scriptURL, { method: 'POST', body: submitData, mode: 'no-cors' })
-            .then(res => console.log('Successfully submitted to App Script'))
-            .catch(err => console.error('Error in App Script submission:', err));
+        const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzDWvGS_jes-iZj9xwrNSnETjf6QQdm13_7Tikgl7KnV44Qi1mZMDuZ-Fawk1T64fo5/exec";
+
+        // শীর্ষ ৩ মতাদর্শের নাম ও % এক লাইনে টেক্সট হিসেবে সাজানো
+        let top3String = sortedCore.slice(0,3).map(c => {
+            let displayPct = Math.round((finalScores[c] / 250) * 100);
+            return `${CAT_NAMES[lang][c]} (${displayPct}%)`;
+        }).join(", ");
+
+        // গুগল শিটের হেডারের (Name, Ideology, Top3) সাথে হুবহু মিলিয়ে ছোট হাতের অক্ষরে পে-লোড তৈরি
+        let payload = {
+            name: name,
+            ideology: ideology,
+            top3: top3String
+        };
+
+        // ডাটা সাবমিট করার নতুন ও ফিক্সড মেথড (CORS ব্লক এড়াতে text/plain ব্যবহার করা হয়েছে)
+        fetch(APPS_SCRIPT_URL, {
+            method: "POST",
+            headers: { "Content-Type": "text/plain" },
+            body: JSON.stringify(payload)
+        })
+        .then(res => res.json())
+        .then(resData => console.log("Success:", resData))
+        .catch(err => console.error("Error sending data:", err));
+        // ---------------------------------
         // -----------------------------------------------------
 
         document.getElementById('quiz-section').style.display='none'; 
