@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Ideology Spectrum | মতাদর্শ নিরুপণ</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700;9..40,800&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        :root {
+            --bg: #060c18;
+            --surface: rgba(10,18,32,0.78);
+            --border: rgba(59,112,232,0.22);
+            --accent: #3b70e8;
+            --accent2: #e8a23b;
+            --text: #e8eeff;
+            --muted: #7a93bc;
+            --card: rgba(14,24,44,0.72);
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+
+        body {
+            background: var(--bg);
+            background-image:
+                radial-gradient(ellipse 80% 60% at 20% 10%, rgba(59,112,232,0.09), transparent),
+                radial-gradient(ellipse 60% 50% at 80% 90%, rgba(100,50,200,0.07), transparent);
+            font-family: 'DM Sans', sans-serif;
+            color: var(--text);
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            padding: 28px 16px 48px;
+        }
+
+        .container {
+            max-width: 760px;
+            width: 100%;
+            background: var(--surface);
+            backdrop-filter: blur(18px);
+            border: 1px solid var(--border);
+            border-radius: 40px;
+            padding: 40px 36px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.04);
+        }
+
+        .site-title {
+            font-family: 'DM Serif Display', serif;
+            font-size: 38px;
+            font-weight: 400;
+            text-align: center;
+            line-height: 1.15;
+            background: linear-gradient(135deg, #ffffff 30%, #a8c4ff);
+            -webkit-background-clip: text; background-clip: text; color: transparent;
+        }
+        .site-title span {
+            background: linear-gradient(135deg, #3b70e8, #e8a23b);
+            -webkit-background-clip: text; background-clip: text; color: transparent;
+        }
+        .subtitle {
+            text-align: center;
+            color: var(--muted);
+            font-size: 13.5px;
+            margin-top: 9px;
+            font-weight: 400;
+            letter-spacing: 0.4px;
+        }
+        .divider {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(59,112,232,0.35), transparent);
+            margin: 26px 0;
+        }
+
+        .field { margin-bottom: 20px; }
+        .field label {
+            font-size: 11.5px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            color: var(--muted);
+            display: block;
+            margin-bottom: 9px;
+        }
+        .field input, .field select {
+            width: 100%;
+            padding: 14px 20px;
+            background: rgba(2,8,20,0.72);
+            border: 1px solid rgba(59,112,232,0.35);
+            border-radius: 28px;
+            color: white;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 15px;
+            transition: all 0.25s;
+            outline: none;
+        }
+        .field input:focus, .field select:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(59,112,232,0.15);
+        }
+        .field select option { background: #0c1828; }
+
+        .btn {
+            padding: 14px 22px;
+            border: none;
+            border-radius: 40px;
+            font-weight: 700;
+            font-size: 14.5px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: 'DM Sans', sans-serif;
+            letter-spacing: 0.3px;
+        }
+        .btn-primary {
+            width: 100%;
+            background: linear-gradient(115deg, #2454d0, #3b70e8);
+            color: white;
+            box-shadow: 0 6px 20px rgba(59,112,232,0.35);
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 28px rgba(59,112,232,0.45);
+        }
+        .btn-ghost {
+            background: rgba(18,30,58,0.65);
+            border: 1px solid rgba(59,112,232,0.45);
+            color: #c0d8ff;
+            backdrop-filter: blur(6px);
+        }
+        .btn-ghost:hover { background: rgba(59,112,232,0.18); border-color: var(--accent); }
+
+        .progress-wrap {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 30px;
+        }
+        .progress-track {
+            flex: 1;
+            height: 5px;
+            background: rgba(30,50,90,0.7);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #3b70e8, #e8a23b);
+            width: 0%;
+            border-radius: 10px;
+            transition: width 0.35s cubic-bezier(0.2,0.9,0.4,1.1);
+        }
+        .progress-label {
+            font-size: 12.5px;
+            font-weight: 700;
+            color: #b0ceff;
+            min-width: 44px;
+            text-align: right;
+        }
+
+        .q-block { display: none; animation: fadeSlide 0.3s ease; }
+        .q-block.active { display: block; }
+        @keyframes fadeSlide {
+            from { opacity:0; transform:translateY(10px); }
+            to { opacity:1; transform:translateY(0); }
+        }
+        .q-text {
+            font-size: 19px;
+            font-weight: 600;
+            line-height: 1.5;
+            margin-bottom: 26px;
+            background: linear-gradient(135deg, #fff, #c5daff);
+            -webkit-background-clip: text; background-clip: text; color: transparent;
+        }
+        .options { display: flex; flex-direction: column; gap: 11px; }
+        .opt-label {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 13px 20px;
+            background: rgba(5,12,25,0.55);
+            border: 1px solid rgba(72,108,180,0.28);
+            border-radius: 40px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 500;
+            font-size: 14px;
+        }
+        .opt-label:hover { background: rgba(59,112,232,0.1); border-color: #3b70e8; }
+        .opt-label.selected {
+            background: rgba(59,112,232,0.22);
+            border-color: #3b70e8;
+            box-shadow: 0 0 10px rgba(59,112,232,0.35);
+        }
+        .opt-label input { width:17px; height:17px; accent-color: #3b70e8; flex-shrink:0; }
+        .nav-row { display: flex; gap: 12px; margin-top: 30px; }
+        #btn-prev, #btn-next, #btn-submit { flex: 1; }
+        #btn-prev { visibility: hidden; }
+        #btn-next { display: block; }
+        #btn-submit { display: none; }
+
+        .result-card {
+            background: var(--card);
+            backdrop-filter: blur(10px);
+            border-radius: 32px;
+            padding: 30px 26px;
+            border: 1px solid rgba(59,112,232,0.38);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .result-card::before {
+            content:'';
+            position:absolute; top:-60px; left:50%; transform:translateX(-50%);
+            width:300px; height:120px;
+            background: radial-gradient(ellipse, rgba(59,112,232,0.14), transparent 70%);
+            pointer-events:none;
+        }
+        .result-tag {
+            display: inline-block;
+            padding: 6px 18px;
+            border-radius: 60px;
+            font-size: 11.5px;
+            font-weight: 800;
+            letter-spacing: 1.2px;
+            background: rgba(59,112,232,0.2);
+            color: #9bc0ff;
+            text-transform: uppercase;
+        }
+        .result-tag.hybrid { background: rgba(232,162,59,0.2); color: #ffda9e; }
+        .result-name { margin-top: 16px; font-size: 14px; color: #9ab8df; font-weight: 500; }
+        .result-ideology {
+            font-family: 'DM Serif Display', serif;
+            font-size: 32px;
+            font-weight: 400;
+            margin: 14px 0 10px;
+            background: linear-gradient(135deg, #fff, #c0dcff);
+            -webkit-background-clip: text; background-clip: text; color: transparent;
+        }
+        .result-desc {
+            font-size: 14.5px;
+            color: #b8d0f0;
+            line-height: 1.6;
+            text-align: center;
+            max-width: 88%;
+            margin: 0 auto;
+        }
+
+        .analysis-section { margin-top: 28px; }
+        .analysis-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 18px;
+        }
+        .analysis-title {
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: var(--muted);
+        }
+        .analysis-line { flex:1; height:1px; background: rgba(59,112,232,0.2); }
+
+        .dim-group { margin-bottom: 22px; }
+        .dim-group-title {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1.4px;
+            text-transform: uppercase;
+            color: rgba(100,140,200,0.7);
+            margin-bottom: 12px;
+            padding-left: 4px;
+            border-left: 2px solid rgba(59,112,232,0.5);
+            padding-left: 8px;
+        }
+        .bar-row {
+            display: grid;
+            grid-template-columns: 140px 1fr 52px;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 11px;
+        }
+        .bar-name {
+            font-size: 12px;
+            font-weight: 500;
+            color: #c0daff;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .bar-track {
+            height: 8px;
+            background: rgba(15,28,55,0.9);
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+        }
+        .bar-fill {
+            height: 100%;
+            border-radius: 12px;
+            transition: width 0.75s cubic-bezier(0.2,0.9,0.4,1.1);
+            position: relative;
+        }
+        .bar-fill::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(90deg, transparent 60%, rgba(255,255,255,0.18));
+            border-radius: 12px;
+        }
+        .bar-pct {
+            text-align: right;
+            font-size: 12px;
+            font-weight: 700;
+            color: #d0e5ff;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .interp-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 12px;
+            margin-top: 18px;
+        }
+        .interp-card {
+            background: rgba(10,20,40,0.7);
+            border: 1px solid rgba(59,112,232,0.2);
+            border-radius: 18px;
+            padding: 14px 16px;
+        }
+        .interp-label {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 6px;
+        }
+        .interp-val {
+            font-size: 13px;
+            font-weight: 600;
+            color: #d8ecff;
+            line-height: 1.45;
+        }
+        .interp-val span {
+            display: inline-block;
+            padding: 1px 8px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            margin-top: 4px;
+        }
+        .level-very-high { background: rgba(59,232,130,0.18); color: #5dffa0; }
+        .level-high { background: rgba(59,112,232,0.2); color: #80b0ff; }
+        .level-medium { background: rgba(200,160,50,0.18); color: #f0c860; }
+        .level-low { background: rgba(200,80,80,0.16); color: #ff9090; }
+        .level-minimal { background: rgba(100,100,100,0.18); color: #aaa; }
+
+        .podium {
+            display: flex;
+            gap: 12px;
+            margin: 20px 0;
+            justify-content: center;
+        }
+        .podium-item {
+            flex: 1;
+            max-width: 160px;
+            background: rgba(10,20,40,0.8);
+            border-radius: 20px;
+            padding: 16px 12px 14px;
+            text-align: center;
+            border: 1px solid rgba(59,112,232,0.2);
+            position: relative;
+        }
+        .podium-item.rank-1 {
+            background: rgba(20,35,70,0.9);
+            border-color: rgba(232,162,59,0.4);
+            box-shadow: 0 0 20px rgba(232,162,59,0.1);
+        }
+        .podium-rank { font-size: 22px; margin-bottom: 4px; }
+        .podium-name { font-size: 11.5px; font-weight: 600; color: #c0d8ff; margin-bottom: 8px; }
+        .podium-pct { font-size: 24px; font-weight: 800; background: linear-gradient(135deg, #fff, #a0c8ff); -webkit-background-clip: text; background-clip: text; color: transparent; }
+        .podium-bar { height: 4px; border-radius: 4px; margin-top: 10px; }
+        .action-row { display: flex; gap: 12px; margin-top: 26px; }
+        .btn-share { background: linear-gradient(115deg, #1a3580, #5a3ab0); color: white; box-shadow: 0 4px 16px rgba(80,60,180,0.3); }
+        .btn-share:hover { transform: translateY(-2px); }
+        .loading-dots { display:flex; justify-content:center; gap:10px; margin-top:28px; }
+        .loading-dots span { width:10px; height:10px; background: #3b70e8; border-radius:50%; animation: pulse 1.2s infinite ease; }
+        .loading-dots span:nth-child(2) { animation-delay: 0.2s; }
+        .loading-dots span:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes pulse { 0%,100%{ opacity:0.25; transform:scale(0.85); } 50%{ opacity:1; transform:scale(1.05); } }
+        #share-status { font-size:12px; text-align:center; margin-top:12px; color:#7aaa80; }
+        
+        #share-canvas-src {
+            position: absolute;
+            top: -99999px;
+            left: -99999px;
+            width: 540px;
+            background: #060c18;
+            font-family: 'DM Sans', sans-serif;
+            color: white;
+            display: block;
+            overflow: hidden;
+        }
+        .sc-bg-top { position: absolute; top: -80px; left: -80px; width: 400px; height: 400px; background: radial-gradient(circle, rgba(59,112,232,0.18), transparent 70%); pointer-events: none; }
+        .sc-bg-bottom { position: absolute; bottom: -60px; right: -60px; width: 360px; height: 360px; background: radial-gradient(circle, rgba(160,80,230,0.12), transparent 70%); pointer-events: none; }
+        .sc-content { position: relative; z-index: 1; padding: 30px 38px 24px; display: flex; flex-direction: column; }
+        .sc-brand { font-size: 12px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(120,160,220,0.7); margin-bottom: 6px; }
+        .sc-divider { height:1px; background:linear-gradient(90deg,transparent,rgba(59,112,232,0.5),transparent); margin:10px 0; }
+        .sc-tag-wrap { margin-bottom: 10px; }
+        .sc-tag { display:inline-block; padding:5px 16px; border-radius:40px; font-size:10.5px; font-weight:800; letter-spacing:1px; text-transform:uppercase; }
+        .sc-participant { font-size:13px; color:rgba(180,210,255,0.8); margin-bottom:6px; }
+        .sc-ideology { font-family: 'DM Serif Display', serif; font-size: 28px; margin: 10px 0 8px; color: #e8f2ff; line-height: 1.2; }
+        .sc-desc { font-size: 13px; color: rgba(180,210,240,0.85); line-height: 1.55; margin-bottom: 16px; }
+        .sc-section-title { font-size: 10px; font-weight: 800; letter-spacing: 1.4px; text-transform: uppercase; color: rgba(100,140,200,0.7); margin-bottom: 12px; }
+        .sc-bar-row { display: grid; grid-template-columns: 120px 1fr 42px; align-items: center; gap: 10px; margin-bottom: 9px; }
+        .sc-bar-name { font-size: 11px; color: #b8d4ff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        .sc-bar-track { height: 6px; background: rgba(20,35,65,0.9); border-radius: 6px; overflow:hidden; }
+        .sc-bar-fill { height:100%; border-radius:6px; }
+        .sc-bar-pct { font-size:11px; font-weight:700; color:#c8e0ff; text-align:right; }
+        .sc-footer { margin-top: 14px; padding-top: 12px; display: flex; align-items: center; justify-content: space-between; }
+        .sc-footer-brand { font-size:10px; color:rgba(80,110,160,0.7); letter-spacing:0.5px; }
+        
+        @media (max-width:600px) {
+            .container { padding:26px 20px; }
+            .q-text { font-size:17px; }
+            .bar-row { grid-template-columns:110px 1fr 46px; }
+            .bar-name { font-size:11px; }
+            .podium { gap:8px; }
+            .interp-grid { grid-template-columns:1fr 1fr; }
+        }
+        @media (max-width:420px) {
+            .site-title { font-size:30px; }
+            .bar-row { grid-template-columns:90px 1fr 42px; }
+            .interp-grid { grid-template-columns:1fr; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="site-title">Ideology <span>Spectrum</span><br>মতাদর্শ নিরুপণ</div>
+    <p class="subtitle">Know Your Political & Economical Alignment</p>
+    <div class="divider"></div>
+
+    <div id="login-section">
+        <div class="field"><label>নাম / Name</label><input type="text" id="username" placeholder="e.g. Mushfiqur Rahman"></div>
+        <div class="field"><label>ভাষা / Language</label><select id="language"><option value="bn">বাংলা</option><option value="en">English</option></select></div>
+        <button class="btn btn-primary" onclick="startQuiz()">শুরু / START →</button>
+    </div>
+
+    <div id="quiz-section" style="display:none;">
+        <div class="progress-wrap"><div class="progress-track"><div class="progress-fill" id="prog-fill"></div></div><div class="progress-label" id="prog-label">1/25</div></div>
+        <div id="questions-container"></div>
+        <div class="nav-row">
+            <button class="btn btn-ghost" id="btn-prev" onclick="prevQ()">← Previous</button>
+            <button class="btn btn-ghost" id="btn-next" onclick="nextQ()">Next →</button>
+            <button class="btn btn-primary" id="btn-submit" onclick="calcResult()">Analyze →</button>
+        </div>
+    </div>
+
+    <div id="result-section" style="display:none;">
+        <div id="loading-area">
+            <div class="result-tag" style="background:rgba(255,255,255,0.08); color:#aac0e0;">Analyzing worldview…</div>
+            <div class="loading-dots"><span></span><span></span><span></span></div>
+        </div>
+        
+        <div id="result-area" style="display:none;">
+            <div class="result-card">
+                <div id="res-tag" class="result-tag"></div>
+                <div class="result-name" id="res-name"></div>
+                <div class="result-ideology" id="res-ideology"></div>
+                <div class="result-desc" id="res-desc"></div>
+            </div>
+            
+            <div class="analysis-section">
+                <div class="analysis-header"><span class="analysis-title">🏆 শীর্ষ মতাদর্শ / Top Ideologies</span><div class="analysis-line"></div></div>
+                <div class="podium" id="podium-area"></div>
+            </div>
+            
+            <div class="analysis-section">
+                <div class="analysis-header"><span class="analysis-title">📊 Dimension Breakdown (%)</span><div class="analysis-line"></div></div>
+                <div id="dim-groups-area"></div>
+            </div>
+            
+            <div class="analysis-section">
+                <div class="analysis-header"><span class="analysis-title">🧭 বিস্তারিত বিশ্লেষণ / Detailed Analysis</span><div class="analysis-line"></div></div>
+                <div class="interp-grid" id="interp-cards"></div>
+            </div>
+            
+            <div class="action-row">
+                <button class="btn btn-share" onclick="shareImage()">📸 Download Image (9:16)</button>
+                <button class="btn btn-ghost" onclick="location.reload()">⟳ Restart</button>
+            </div>
+            <div id="share-status"></div>
+        </div>
+    </div>
+</div>
+
+<div id="share-canvas-src">
+    <div class="sc-bg-top"></div>
+    <div class="sc-bg-bottom"></div>
+    <div class="sc-content">
+        <div class="sc-brand">● IDEOLOGY SPECTRUM • মতাদর্শ নিরুপণ</div>
+        <div class="sc-divider"></div>
+        <div class="sc-tag-wrap"><div id="sc-tag" class="sc-tag"></div></div>
+        <div class="sc-participant" id="sc-name"></div>
+        <div class="sc-ideology" id="sc-ideology"></div>
+        <div class="sc-desc" id="sc-desc"></div>
+        <div class="sc-divider"></div>
+        <div class="sc-section-title">🏆 শীর্ষ তিনটি মতাদর্শ</div>
+        <div class="sc-top3" id="sc-top3"></div>
+        <div class="sc-section-title">📊 DIMENSION BREAKDOWN (%)</div>
+        <div id="sc-bars"></div>
+        <div class="sc-footer">
+            <div><div class="sc-footer-brand">ideologyspectrum.app</div></div>
+        </div>
+    </div>
+</div>
+
+<script>
+const CATEGORIES = ["cap", "soc", "prog", "cons", "isl_law", "secular", "cent", "left", "fem", "pragmatic"];
+
+const CAT_NAMES = { 
+    bn: { cap:"উদার পুঁজিবাদ", soc:"গণতান্ত্রিক সমাজতন্ত্র", prog:"প্রগতিশীল আধুনিকতাবাদ", cons:"ঐতিহ্যগত রক্ষণশীলতা", isl_law:"ইসলামী শরীয়াহ", secular:"সেকুলার জাতীয়তাবাদ", cent:"সামাজিক মধ্যপন্থা", left:"বিপ্লবী বামপন্থা", fem:"নারীবাদী", pragmatic:"নিরপেক্ষ বাস্তববাদ" },
+    en: { cap:"Liberal Capitalism", soc:"Democratic Socialism", prog:"Progressive Modernism", cons:"Traditional Conservatism", isl_law:"Islamist Alignment", secular:"Secular Nationalism", cent:"Centrist / Social Capitalism", left:"Revolutionary Left-Wing", fem:"Feminist Ideology", pragmatic:"Neutral / Pragmatist" }
+};
+
+const BAR_COLORS = { cap:"#3b82f6", soc:"#e84b3b", prog:"#22d3a0", cons:"#a78bfa", isl_law:"#f59e0b", secular:"#06b6d4", cent:"#6b7280", left:"#ef4444", fem:"#f472b6", pragmatic:"#94a3b8" };
+
+const DIM_GROUPS = [
+    { key:"economic", title_bn:"💰 অর্থনৈতিক ও রাষ্ট্রীয় দর্শন", title_en:"💰 Economic & State Philosophy", cats:["cap","soc","left","cent"] },
+    { key:"religion", title_bn:"🕌 ধর্ম, সমাজ ও ঐতিহ্য", title_en:"🕌 Religion, Society & Tradition", cats:["isl_law","secular","cons","prog","fem","pragmatic"] }
+];
+
+const QS = [
+    { bn:"১. দেশের প্রধান ভারী শিল্প ও উৎপাদন খাতগুলো বেসরকারি মালিকানায় না রেখে রাষ্ট্রীয় নিয়ন্ত্রণে রাখা উচিত।", en:"1. Major heavy industries and production sectors should be under state control.", 
+      opts:[{cap:0, soc:7, prog:0, cons:0, isl_law:1, secular:0, cent:1, left:1, fem:0, pragmatic:0},{cap:0, soc:6, prog:0, cons:0, isl_law:1, secular:0, cent:2, left:1, fem:0, pragmatic:0},{cap:0, soc:1, prog:0, cons:1, isl_law:0, secular:0, cent:1, left:0, fem:0, pragmatic:7},{cap:6, soc:0, prog:0, cons:1, isl_law:0, secular:1, cent:2, left:0, fem:0, pragmatic:0},{cap:7, soc:0, prog:0, cons:1, isl_law:0, secular:1, cent:1, left:0, fem:0, pragmatic:0}] },
+    { bn:"২. ধনীদের ওপর অত্যন্ত উচ্চ হারে প্রোগ্রেসিভ ট্যাক্স চাপানো উচিত যাতে সমাজ থেকে শ্রেণী বৈষম্য দূর হয়।", en:"2. Extremely high progressive taxes should be imposed on the rich.", 
+      opts:[{cap:0, soc:6, prog:1, cons:0, isl_law:0, secular:0, cent:0, left:3, fem:0, pragmatic:0},{cap:0, soc:5, prog:1, cons:0, isl_law:0, secular:0, cent:2, left:2, fem:0, pragmatic:0},{cap:1, soc:1, prog:0, cons:0, isl_law:0, secular:0, cent:1, left:0, fem:0, pragmatic:7},{cap:5, soc:0, prog:0, cons:2, isl_law:0, secular:0, cent:3, left:0, fem:0, pragmatic:0},{cap:7, soc:0, prog:0, cons:3, isl_law:0, secular:0, cent:0, left:0, fem:0, pragmatic:0}] },
+    { bn:"৩. ব্যবসা ও বিনিয়োগ বাড়ানোর জন্য কর্পোরেট ট্যাক্স এবং সরকারি নিয়ন্ত্রণ যত কম রাখা যায় তত ভালো।", en:"3. Corporate taxes and government regulations should be as low as possible.", 
+      opts:[{cap:7, soc:0, prog:1, cons:0, isl_law:0, secular:0, cent:0, left:0, fem:0, pragmatic:2},{cap:6, soc:0, prog:1, cons:0, isl_law:0, secular:0, cent:2, left:0, fem:0, pragmatic:1},{cap:1, soc:1, prog:0, cons:0, isl_law:0, secular:0, cent:1, left:0, fem:0, pragmatic:7},{cap:0, soc:5, prog:0, cons:1, isl_law:0, secular:0, cent:2, left:2, fem:0, pragmatic:0},{cap:0, soc:6, prog:0, cons:1, isl_law:0, secular:0, cent:0, left:3, fem:0, pragmatic:0}] },
+    { bn:"৪. রাষ্ট্রের আইন, বিচার ও নীতিমালার প্রধান ও চূড়ান্ত উৎস হওয়া উচিত ধর্মীয় অনুশাসন বা শরীয়াহ।", en:"4. The primary and ultimate source of state laws should be religious decrees.", 
+      opts:[{cap:0, soc:0, prog:0, cons:1, isl_law:9, secular:0, cent:0, left:0, fem:0, pragmatic:0},{cap:0, soc:0, prog:0, cons:1, isl_law:8, secular:0, cent:0, left:0, fem:0, pragmatic:1},{cap:0, soc:0, prog:1, cons:1, isl_law:1, secular:0, cent:0, left:0, fem:0, pragmatic:7},{cap:1, soc:0, prog:1, cons:0, isl_law:0, secular:7, cent:1, left:0, fem:0, pragmatic:0},{cap:0, soc:0, prog:1, cons:0, isl_law:0, secular:8, cent:1, left:0, fem:0, pragmatic:0}] },
+    { bn:"৫. রাষ্ট্র ও রাজনীতি থেকে ধর্মকে সম্পূর্ণ আলাদা রাখা উচিত এবং বিচার ব্যবস্থা সর্বজনীন মানবাধিকারের ভিত্তিতে হওয়া উচিত।", en:"5. Religion should be completely separate from state and politics.", 
+      opts:[{cap:1, soc:0, prog:3, cons:0, isl_law:0, secular:6, cent:0, left:0, fem:0, pragmatic:0},{cap:1, soc:0, prog:2, cons:0, isl_law:0, secular:5, cent:2, left:0, fem:0, pragmatic:0},{cap:0, soc:0, prog:1, cons:1, isl_law:1, secular:0, cent:0, left:0, fem:0, pragmatic:7},{cap:0, soc:0, prog:0, cons:3, isl_law:5, secular:0, cent:1, left:0, fem:0, pragmatic:1},{cap:0, soc:0, prog:0, cons:3, isl_law:7, secular:0, cent:0, left:0, fem:0, pragmatic:0}] },
+    { bn:"৬. সুদভিত্তিক অর্থব্যবস্থা পরিবর্তন করে লাভ-ক্ষতি শেয়ার ভিত্তিক অর্থব্যবস্থা চালু করা উচিত।", en:"6. The interest-based financial system should be replaced by a profit-loss sharing based financial system.", 
+      opts:[{cap:0, soc:0, prog:0, cons:1, isl_law:9, secular:0, cent:0, left:0, fem:0, pragmatic:0},{cap:0, soc:1, prog:0, cons:1, isl_law:8, secular:0, cent:0, left:0, fem:0, pragmatic:1},{cap:0, soc:0, prog:0, cons:1, isl_law:1, secular:1, cent:0, left:0, fem:0, pragmatic:7},{cap:6, soc:0, prog:1, cons:0, isl_law:0, secular:2, cent:1, left:0, fem:0, pragmatic:0},{cap:7, soc:0, prog:1, cons:0, isl_law:0, secular:2, cent:0, left:0, fem:0, pragmatic:0}] },
+    { bn:"৭. দেশের সার্বিক উন্নয়নের জন্য সর্বস্তরে সহশিক্ষা এবং নারীদের অবাধ কর্মসংস্থান নিশ্চিত করা জরুরি।", en:"7. Co-education and women's unhindered employment are vital.", 
+      opts:[{cap:1, soc:0, prog:4, cons:0, isl_law:0, secular:1, cent:0, left:0, fem:4, pragmatic:0},{cap:1, soc:0, prog:3, cons:0, isl_law:0, secular:1, cent:2, left:0, fem:3, pragmatic:0},{cap:0, soc:0, prog:1, cons:1, isl_law:0, secular:0, cent:1, left:0, fem:0, pragmatic:7},{cap:0, soc:0, prog:0, cons:3, isl_law:4, secular:0, cent:2, left:0, fem:1, pragmatic:0},{cap:0, soc:0, prog:0, cons:4, isl_law:5, secular:0, cent:0, left:0, fem:1, pragmatic:0}] },
+    { bn:"৮. নারীদের উচ্চশিক্ষা ও কর্মসংস্থানের অধিকার রয়েছে, তবে কাজের পরিবেশ ধর্মীয় ও শালীনতার নীতি মেনে হওয়া উচিত।", en:"8. Work environments must follow religious modesty norms.", 
+      opts:[{cap:0, soc:0, prog:0, cons:5, isl_law:4, secular:0, cent:1, left:0, fem:0, pragmatic:0},{cap:0, soc:0, prog:1, cons:4, isl_law:3, secular:0, cent:1, left:0, fem:1, pragmatic:0},{cap:0, soc:0, prog:1, cons:1, isl_law:0, secular:0, cent:1, left:0, fem:0, pragmatic:7},{cap:1, soc:0, prog:3, cons:0, isl_law:0, secular:1, cent:2, left:0, fem:3, pragmatic:0},{cap:1, soc:0, prog:4, cons:0, isl_law:0, secular:1, cent:0, left:0, fem:4, pragmatic:0}] },
+    { bn:"৯. পোশাকের স্বাধীনতা সম্পূর্ণ ব্যক্তিগত বিষয়; রাষ্ট্র বা সমাজের উচিত নয় বাধ্যবাধকতা আরোপ করা।", en:"9. Freedom of attire is strictly personal.", 
+      opts:[{cap:1, soc:0, prog:4, cons:0, isl_law:0, secular:1, cent:0, left:0, fem:4, pragmatic:0},{cap:1, soc:0, prog:3, cons:0, isl_law:0, secular:1, cent:2, left:0, fem:3, pragmatic:0},{cap:0, soc:0, prog:1, cons:1, isl_law:0, secular:0, cent:1, left:0, fem:0, pragmatic:7},{cap:0, soc:0, prog:0, cons:4, isl_law:4, secular:0, cent:2, left:0, fem:0, pragmatic:0},{cap:0, soc:0, prog:0, cons:5, isl_law:5, secular:0, cent:0, left:0, fem:0, pragmatic:0}] },
+    { bn:"১০. কওমি ও আলিয়া মাদ্রাসার ধর্মীয় শিক্ষাকে সমান রাষ্ট্রীয় মর্যাদা এবং সমমান দেওয়া উচিত।", en:"10. Madrasah education should receive equal state recognition.", 
+      opts:[{cap:0, soc:0, prog:0, cons:4, isl_law:6, secular:0, cent:0, left:0, fem:0, pragmatic:0},{cap:0, soc:0, prog:0, cons:3, isl_law:5, secular:0, cent:1, left:0, fem:0, pragmatic:1},{cap:0, soc:0, prog:1, cons:1, isl_law:1, secular:0, cent:0, left:0, fem:0, pragmatic:7},{cap:1, soc:0, prog:2, cons:0, isl_law:0, secular:4, cent:2, left:0, fem:0, pragmatic:1},{cap:1, soc:0, prog:3, cons:0, isl_law:0, secular:6, cent:0, left:0, fem:0, pragmatic:0}] },
+    { bn:"১১. মাদ্রাসা শিক্ষা বিলুপ্ত করে সবার জন্য একটি একক ধর্মনিরপেক্ষ শিক্ষা ব্যবস্থা চালু করা উচিত।", en:"11. Madrasah education should be abolished for a secular education system.", 
+      opts:[{cap:1, soc:0, prog:4, cons:0, isl_law:0, secular:5, cent:0, left:0, fem:0, pragmatic:0},{cap:1, soc:0, prog:3, cons:0, isl_law:0, secular:4, cent:2, left:0, fem:0, pragmatic:0},{cap:0, soc:0, prog:1, cons:1, isl_law:1, secular:0, cent:0, left:0, fem:0, pragmatic:7},{cap:0, soc:0, prog:0, cons:3, isl_law:5, secular:0, cent:2, left:0, fem:0, pragmatic:0},{cap:0, soc:0, prog:0, cons:4, isl_law:6, secular:0, cent:0, left:0, fem:0, pragmatic:0}] },
+    { bn:"১২. সামাজিক প্রথা বা ধর্মীয় ঐতিহ্য মানবাধিকার পরিপন্থী হলে তা আইন করে ভেঙে ফেলা উচিত।", en:"12. Customs opposing human rights should be legally dismantled.", 
+      opts:[{cap:0, soc:0, prog:6, cons:0, isl_law:0, secular:2, cent:0, left:0, fem:2, pragmatic:0},{cap:0, soc:0, prog:4, cons:0, isl_law:0, secular:2, cent:2, left:0, fem:2, pragmatic:0},{cap:0, soc:0, prog:1, cons:1, isl_law:0, secular:0, cent:1, left:0, fem:0, pragmatic:7},{cap:0, soc:0, prog:0, cons:4, isl_law:3, secular:0, cent:2, left:0, fem:0, pragmatic:1},{cap:0, soc:0, prog:0, cons:5, isl_law:5, secular:0, cent:0, left:0, fem:0, pragmatic:0}] },
+    { bn:"১৩. ঐতিহ্য এবং পারিবারিক মূল্যবোধই সমাজের মূল ভিত্তি; একে পরিবর্তন করা ক্ষতিকর।", en:"13. Traditions and family values are core; changing them is harmful.", 
+      opts:[{cap:0, soc:0, prog:0, cons:6, isl_law:2, secular:0, cent:2, left:0, fem:0, pragmatic:0},{cap:0, soc:0, prog:0, cons:5, isl_law:2, secular:0, cent:2, left:0, fem:0, pragmatic:1},{cap:0, soc:0, prog:1, cons:1, isl_law:0, secular:0, cent:1, left:0, fem:0, pragmatic:7},{cap:1, soc:0, prog:4, cons:0, isl_law:0, secular:2, cent:1, left:0, fem:2, pragmatic:0},{cap:1, soc:0, prog:5, cons:0, isl_law:0, secular:2, cent:0, left:0, fem:2, pragmatic:0}] },
+    { bn:"১৪. সামাজিক শৃঙ্খলা ও রাষ্ট্রের প্রতি আনুগত্য বজায় রাখা ব্যক্তির পোশাক বা চিন্তার স্বাধীনতার চেয়ে বেশি গুরুত্বপূর্ণ।", en:"14. Social order is more important than individual freedom.", 
+      opts:[{cap:0, soc:0, prog:0, cons:6, isl_law:2, secular:0, cent:2, left:0, fem:0, pragmatic:0},{cap:0, soc:0, prog:0, cons:4, isl_law:2, secular:0, cent:2, left:0, fem:0, pragmatic:2},{cap:0, soc:0, prog:1, cons:1, isl_law:0, secular:0, cent:1, left:0, fem:0, pragmatic:7},{cap:1, soc:0, prog:4, cons:0, isl_law:0, secular:1, cent:2, left:0, fem:0, pragmatic:2},{cap:2, soc:0, prog:5, cons:0, isl_law:0, secular:1, cent:0, left:0, fem:2, pragmatic:0}] },
+    { bn:"১৫. গণমাধ্যম স্বাধীন হওয়া উচিত, তবে দেশীয় ঐতিহ্য রুখতে যৌক্তিক রাষ্ট্রীয় সেন্সরশিপ থাকা দরকার।", en:"15. Media needs state censorship to protect local traditions.", 
+      opts:[{cap:0, soc:2, prog:0, cons:4, isl_law:2, secular:0, cent:2, left:0, fem:0, pragmatic:0},{cap:0, soc:1, prog:0, cons:3, isl_law:2, secular:0, cent:3, left:0, fem:0, pragmatic:1},{cap:1, soc:0, prog:0, cons:1, isl_law:0, secular:0, cent:1, left:0, fem:0, pragmatic:7},{cap:4, soc:0, prog:3, cons:0, isl_law:0, secular:1, cent:2, left:0, fem:0, pragmatic:0},{cap:5, soc:0, prog:4, cons:0, isl_law:0, secular:1, cent:0, left:0, fem:0, pragmatic:0}] },
+    { bn:"১৬. দেশে মসজিদ-মাদ্রাসা ও ইসলামিক শিক্ষা প্রসারের জন্য সরকারি বরাদ্দ বাড়ানো উচিত।", en:"16. Government should increase funds for mosques and Islamic education.", 
+      opts:[{cap:0, soc:0, prog:0, cons:3, isl_law:7, secular:0, cent:0, left:0, fem:0, pragmatic:0},{cap:0, soc:0, prog:0, cons:3, isl_law:5, secular:0, cent:1, left:0, fem:0, pragmatic:1},{cap:0, soc:0, prog:1, cons:1, isl_law:1, secular:0, cent:0, left:0, fem:0, pragmatic:7},{cap:1, soc:0, prog:2, cons:0, isl_law:0, secular:4, cent:2, left:0, fem:0, pragmatic:1},{cap:1, soc:0, prog:3, cons:0, isl_law:0, secular:6, cent:0, left:0, fem:0, pragmatic:0}] },
+    { bn:"১৭. বাংলাদেশের শুধু নিজেদের অর্থনৈতিক লাভের স্বার্থে সবার সাথে লিবারাল ব্যবসায়িক সম্পর্ক রাখা উচিত।", en:"17. Maintain liberal trade ties purely for economic gain.", 
+      opts:[{cap:4, soc:0, prog:0, cons:0, isl_law:0, secular:0, cent:1, left:0, fem:0, pragmatic:5},{cap:3, soc:0, prog:0, cons:0, isl_law:0, secular:0, cent:3, left:0, fem:0, pragmatic:4},{cap:1, soc:0, prog:0, cons:0, isl_law:0, secular:0, cent:1, left:0, fem:0, pragmatic:8},{cap:0, soc:2, prog:1, cons:1, isl_law:2, secular:1, cent:1, left:2, fem:0, pragmatic:0},{cap:0, soc:3, prog:1, cons:1, isl_law:3, secular:1, cent:0, left:1, fem:0, pragmatic:0}] },
+    { bn:"১৮. বাংলাদেশের উচিত মুসলিম বিশ্ব ও সাম্রাজ্যবাদ বিরোধী জোটের সাথে সম্পর্ক জোরদার করা।", en:"18. Strengthen ties with Muslim and anti-imperialist blocs.", 
+      opts:[{cap:0, soc:1, prog:0, cons:2, isl_law:4, secular:0, cent:0, left:3, fem:0, pragmatic:0},{cap:0, soc:1, prog:0, cons:2, isl_law:3, secular:0, cent:2, left:2, fem:0, pragmatic:0},{cap:1, soc:0, prog:0, cons:1, isl_law:1, secular:0, cent:0, left:0, fem:0, pragmatic:7},{cap:3, soc:0, prog:1, cons:0, isl_law:0, secular:2, cent:2, left:0, fem:0, pragmatic:2},{cap:5, soc:0, prog:1, cons:0, isl_law:0, secular:3, cent:0, left:0, fem:0, pragmatic:1}] },
+    { bn:"১৯. শিক্ষা, স্বাস্থ্য ও কৃষির মতো মৌলিক খাতগুলো সম্পূর্ণ রাষ্ট্রের অধীনে থাকা উচিত।", en:"19. Basic sectors must be fully state-owned.", 
+      opts:[{cap:0, soc:5, prog:0, cons:0, isl_law:0, secular:0, cent:1, left:4, fem:0, pragmatic:0},{cap:0, soc:4, prog:0, cons:0, isl_law:0, secular:0, cent:3, left:3, fem:0, pragmatic:0},{cap:1, soc:1, prog:0, cons:0, isl_law:0, secular:0, cent:1, left:0, fem:0, pragmatic:7},{cap:5, soc:0, prog:1, cons:0, isl_law:0, secular:0, cent:2, left:0, fem:0, pragmatic:2},{cap:7, soc:0, prog:1, cons:0, isl_law:0, secular:0, cent:0, left:0, fem:0, pragmatic:2}] },
+    { bn:"২০. সমকামী এবং লিঙ্গবৈচিত্র্যময় (LGBTQ+) মানুষের অধিকার ও জীবনধারাকে বৈধতা দেওয়া উচিত।", en:"20. Recognize and protect LGBTQ+ rights.", 
+      opts:[{cap:0, soc:0, prog:5, cons:0, isl_law:0, secular:2, cent:0, left:1, fem:2, pragmatic:0},{cap:0, soc:0, prog:4, cons:0, isl_law:0, secular:1, cent:2, left:0, fem:2, pragmatic:1},{cap:0, soc:0, prog:1, cons:1, isl_law:1, secular:0, cent:0, left:0, fem:0, pragmatic:7},{cap:0, soc:0, prog:0, cons:4, isl_law:4, secular:0, cent:2, left:0, fem:0, pragmatic:0},{cap:0, soc:0, prog:0, cons:5, isl_law:5, secular:0, cent:0, left:0, fem:0, pragmatic:0}] },
+    { bn:"২১. দেশের সমৃদ্ধির জন্য প্রতিটি যোগ্য নারীর প্রাতিষ্ঠানিক কর্মক্ষেত্রে যুক্ত হওয়া উচিত।", en:"21. Every capable woman should join the formal workforce.", 
+      opts:[{cap:1, soc:0, prog:3, cons:0, isl_law:0, secular:1, cent:0, left:0, fem:5, pragmatic:0},{cap:1, soc:0, prog:2, cons:0, isl_law:0, secular:1, cent:2, left:0, fem:4, pragmatic:0},{cap:0, soc:0, prog:1, cons:1, isl_law:0, secular:0, cent:1, left:0, fem:0, pragmatic:7},{cap:0, soc:0, prog:0, cons:4, isl_law:4, secular:0, cent:2, left:0, fem:0, pragmatic:0},{cap:0, soc:0, prog:0, cons:5, isl_law:5, secular:0, cent:0, left:0, fem:0, pragmatic:0}] },
+    { bn:"২২. ইলন মাস্কের মতো সফল উদ্যোক্তাদের ট্রিলিয়ন ডলারের মালিক হওয়া সম্পূর্ণ যুক্তিযুক্ত।", en:"22. It's logical for successful entrepreneurs to own trillion-dollar fortunes.", 
+      opts:[{cap:8, soc:0, prog:0, cons:0, isl_law:0, secular:0, cent:0, left:0, fem:0, pragmatic:2},{cap:6, soc:0, prog:0, cons:0, isl_law:0, secular:0, cent:2, left:0, fem:0, pragmatic:2},{cap:1, soc:1, prog:0, cons:0, isl_law:0, secular:0, cent:1, left:0, fem:0, pragmatic:7},{cap:0, soc:4, prog:0, cons:0, isl_law:0, secular:0, cent:2, left:4, fem:0, pragmatic:0},{cap:0, soc:5, prog:0, cons:0, isl_law:0, secular:0, cent:0, left:5, fem:0, pragmatic:0}] },
+    { bn:"২৩. আমাদের সমাজে বিদ্যমান পুরুষতান্ত্রিক মানসিকতা দূর করতে আমূল সংস্কার প্রয়োজন।", en:"23. Radical reforms are needed to eliminate patriarchal mindsets.", 
+      opts:[{cap:0, soc:0, prog:1, cons:0, isl_law:0, secular:1, cent:0, left:1, fem:7, pragmatic:0},{cap:0, soc:0, prog:1, cons:0, isl_law:0, secular:1, cent:1, left:1, fem:6, pragmatic:0},{cap:0, soc:0, prog:1, cons:1, isl_law:0, secular:0, cent:1, left:0, fem:0, pragmatic:7},{cap:0, soc:0, prog:0, cons:4, isl_law:5, secular:0, cent:1, left:0, fem:0, pragmatic:0},{cap:0, soc:0, prog:0, cons:5, isl_law:5, secular:0, cent:0, left:0, fem:0, pragmatic:0}] },
+    { bn:"২৪. বিশ্বের ৭৫% সম্পদ ১০% ধনকুবের কাছে থাকা কোনো বৈষম্য নয় - এটি তাদের প্রতিভার মূল্যায়ন।", en:"24. 10% owning 75% wealth is valuation of their talent.", 
+      opts:[{cap:8, soc:0, prog:0, cons:0, isl_law:0, secular:0, cent:0, left:0, fem:0, pragmatic:2},{cap:6, soc:0, prog:0, cons:0, isl_law:0, secular:0, cent:2, left:0, fem:0, pragmatic:2},{cap:1, soc:1, prog:0, cons:0, isl_law:0, secular:0, cent:1, left:0, fem:0, pragmatic:7},{cap:0, soc:4, prog:0, cons:0, isl_law:0, secular:0, cent:2, left:4, fem:0, pragmatic:0},{cap:0, soc:5, prog:0, cons:0, isl_law:0, secular:0, cent:0, left:5, fem:0, pragmatic:0}] },
+    { bn:"২৫. কোনো নির্দিষ্ট মতাদর্শে বিশ্বাস না করে পরিস্থিতি অনুযায়ী বাস্তবমুখী সিদ্ধান্ত নেওয়াই শ্রেয়।", en:"25. Pragmatic context-driven decisions are always preferable.", 
+      opts:[{cap:0, soc:0, prog:0, cons:0, isl_law:0, secular:0, cent:2, left:0, fem:0, pragmatic:8},{cap:1, soc:0, prog:0, cons:0, isl_law:0, secular:0, cent:3, left:0, fem:0, pragmatic:6},{cap:0, soc:0, prog:0, cons:0, isl_law:0, secular:0, cent:1, left:0, fem:0, pragmatic:9},{cap:2, soc:1, prog:1, cons:1, isl_law:2, secular:1, cent:1, left:1, fem:0, pragmatic:0},{cap:3, soc:1, prog:1, cons:1, isl_law:2, secular:1, cent:0, left:1, fem:0, pragmatic:0}] }
+];
+
+function computeMaxScores() { 
+    let max = {}; 
+    CATEGORIES.forEach(c => max[c] = 0.001); 
+    for (let q of QS) {
+        for (let c of CATEGORIES) {
+            let maxInQ = 0;
+            for (let opt of q.opts) {
+                if (opt && opt[c] > maxInQ) maxInQ = opt[c];
+            }
+            max[c] += maxInQ;
+        }
+    }
+    return max;
+}
+const MAX_SCORES = computeMaxScores();
+
+let lang = 'bn', qIdx = 0, userAnswers = new Array(25).fill(null);
+
+function startQuiz() { 
+    let name = document.getElementById('username').value.trim(); 
+    lang = document.getElementById('language').value; 
+    if (!name) { alert(lang==='bn'?'অনুগ্রহ করে আপনার নাম লিখুন।':'Please enter your name.'); return; } 
+
+    document.getElementById('login-section').style.display = 'none'; 
+    document.getElementById('quiz-section').style.display = 'block'; 
+    qIdx = 0; 
+    renderQuestions(); showQuestion(0); 
+}
+
+function renderQuestions() { 
+    let container = document.getElementById('questions-container'); container.innerHTML = ''; 
+    QS.forEach((q, idx) => { 
+        let div = document.createElement('div'); div.className = 'q-block'; div.id = `qb-${idx}`; 
+        let text = lang === 'bn' ? q.bn : q.en; 
+        let optsLang = lang==='bn' ? ['সম্পূর্ণ একমত','একমত','মতামত নেই','দ্বিমত','সম্পূর্ণ দ্বিমত'] : ['Strongly Agree','Agree','Neutral','Disagree','Strongly Disagree']; 
+        let html = `<p class="q-text">${text}</p><div class="options">`; 
+        for(let i=0;i<5;i++) html += `<label class="opt-label" id="lbl-${idx}-${i}"><input type="radio" name="q${idx}" value="${i}" onchange="selectOption(${idx},${i})"><span>${optsLang[i]}</span></label>`; 
+        html += `</div>`; 
+        div.innerHTML = html; container.appendChild(div); 
+    }); 
+}
+
+function selectOption(qi, optIdx) { 
+    userAnswers[qi] = optIdx; 
+    for(let i=0;i<5;i++) document.getElementById(`lbl-${qi}-${i}`)?.classList.remove('selected'); 
+    document.getElementById(`lbl-${qi}-${optIdx}`)?.classList.add('selected'); 
+    if(qi < QS.length-1) setTimeout(() => nextQ(), 280); 
+    else { document.getElementById('btn-submit').style.display = 'block'; document.getElementById('btn-next').style.display = 'none'; } 
+}
+
+function showQuestion(i) { 
+    document.querySelectorAll('.q-block').forEach(b => b.classList.remove('active')); 
+    document.getElementById(`qb-${i}`)?.classList.add('active'); 
+    let pct = ((i+1)/QS.length)*100; 
+    document.getElementById('prog-fill').style.width = pct+'%'; 
+    document.getElementById('prog-label').innerHTML = `${i+1} / 25`; 
+    document.getElementById('btn-prev').style.visibility = i===0 ? 'hidden' : 'visible'; 
+    if(i === QS.length-1) { document.getElementById('btn-next').style.display='none'; document.getElementById('btn-submit').style.display='block'; } 
+    else { document.getElementById('btn-next').style.display='block'; document.getElementById('btn-submit').style.display='none'; } 
+    if (userAnswers[i] !== null) { 
+        let sel = userAnswers[i]; 
+        for(let j=0;j<5;j++) document.getElementById(`lbl-${i}-${j}`)?.classList.remove('selected'); 
+        document.getElementById(`lbl-${i}-${sel}`)?.classList.add('selected'); 
+    } 
+}
+
+function prevQ() { if(qIdx>0){qIdx--;showQuestion(qIdx);} }
+function nextQ() { if(userAnswers[qIdx]===null){alert(lang==='bn'?'দয়া করে উত্তর নির্বাচন করুন।':'Please select an answer.');return;} if(qIdx<QS.length-1){qIdx++;showQuestion(qIdx);} }
+
+function getLevelLabel(score, L) { 
+    let pct = (score/250)*100;
+    if(pct>=75) return L==='bn'?'অত্যন্ত উচ্চ':'Very High'; 
+    if(pct>=55) return L==='bn'?'উচ্চ':'High'; 
+    if(pct>=35) return L==='bn'?'মধ্যম':'Moderate'; 
+    if(pct>=15) return L==='bn'?'নিম্ন':'Low'; 
+    return L==='bn'?'নগণ্য':'Minimal'; 
+}
+function getLevelClass(score) { 
+    let pct = (score/250)*100;
+    if(pct>=75) return 'level-very-high'; 
+    if(pct>=55) return 'level-high'; 
+    if(pct>=35) return 'level-medium'; 
+    if(pct>=15) return 'level-low'; 
+    return 'level-minimal'; 
+}
+
+// -------------------------------------------------------
+// CONTRADICTION CHECKER 
+// -------------------------------------------------------
+function checkForContradictions(answers) {
+    const SA = (q) => answers[q] === 0;   
+    const SD = (q) => answers[q] === 4;   
+
+    const block1 = SD(3) && SD(9);
+    const block2 = SD(21) && SD(23);
+    const block3 = SD(0) && SD(18);
+
+    if (block1 && block2 && block3) return true;
+    if (SA(3) && SA(22)) return true;
+    if (SA(3) && SA(19)) return true;
+    if (SA(3) && SA(10)) return true;
+    if (SA(3) && SA(4)) return true;
+    if (SA(15) && SA(4)) return true;
+    if (SA(9) && SA(10)) return true;
+    if (SA(1) && SA(2)) return true;
+    if (SA(5) && SA(21)) return true;
+    if (SA(3) && SD(9)) return true;
+    if (SA(10) && SD(4)) return true;
+
+    return false;
+}
+
+// -------------------------------------------------------
+// STRICT PRAGMATIST CHECKER (ID: 10)
+// -------------------------------------------------------
+function isStrictPragmatist(answers) {
+    // Check if 1 to 24 (index 0 to 23) are all Neutral (index 2)
+    for (let i = 0; i < 24; i++) {
+        if (answers[i] !== 2) return false;
+    }
+    // Check if 25 (index 24) is SA(0), A(1), or N(2)
+    return (answers[24] === 0 || answers[24] === 1 || answers[24] === 2);
+}
+
+async function calcResult() {
+    try {
+        for(let i=0;i<QS.length;i++) if(userAnswers[i]===null){ alert(lang==='bn'?'সব প্রশ্নের উত্তর দিন!':'Answer all questions!'); return; }
+        
+        let raw = {}; CATEGORIES.forEach(c => raw[c] = 0);
+        for(let i=0;i<QS.length;i++) {
+            let optIdx = userAnswers[i];
+            let scores = QS[i].opts[optIdx];
+            if(scores) for(let c in scores) raw[c] += scores[c];
+        }
+
+        let finalScores = {};
+        CATEGORIES.forEach(c => {
+            let maxPossible = MAX_SCORES[c] || 1;
+            let normalizedPct = (raw[c] / maxPossible);
+            finalScores[c] = Math.round(normalizedPct * 250);
+        });
+
+        const ALL_IDEOLOGIES = {
+            1: { bn: "উদার পুঁজিবাদ", en: "Liberal Capitalism", desc_bn: "মুক্ত বাজার ও ব্যক্তিগত স্বাধীনতায় দৃঢ় বিশ্বাসী।", desc_en: "Strongly believes in free markets and individual liberty." },
+            2: { bn: "গণতান্ত্রিক সমাজতন্ত্র", en: "Democratic Socialism", desc_bn: "রাষ্ট্রীয় কল্যাণ ও ন্যায়বিচারভিত্তিক সমাজ গড়াই আপনার লক্ষ্য।", desc_en: "Aims to build a society based on state welfare and social justice." },
+            3: { bn: "প্রগতিশীল আধুনিকতাবাদ", en: "Progressive Modernism", desc_bn: "আধুনিক সংস্কার ও সর্বজনীন মানবাধিকারের পক্ষে আপনি দৃঢ়।", desc_en: "Firmly stands for modern reforms and universal human rights." },
+            4: { bn: "ঐতিহ্যগত রক্ষণশীলতা", en: "Traditional Conservatism", desc_bn: "সামাজিক স্থিতিশীলতা ও পুরনো ঐতিহ্য রক্ষায় আপনি প্রতিশ্রুতিবদ্ধ।", desc_en: "Committed to maintaining social stability and preserving old traditions." },
+            5: { bn: "ইসলামী শরীয়াহ ব্লক", en: "Islamist Alignment", desc_bn: "শরীয়াহ আইন ও ইসলামী নীতিমালার ভিত্তিতে রাষ্ট্র পরিচালনায় বিশ্বাসী।", desc_en: "Believes in governing the state based on Sharia law and Islamic principles." },
+            6: { bn: "সেকুলার জাতীয়তাবাদ", en: "Secular Nationalism", desc_bn: "ধর্ম ও রাষ্ট্রের সম্পূর্ণ পৃথকীকরণে বিশ্বাসী।", desc_en: "Believes in the complete separation of religion and state." },
+            7: { bn: "সামাজিক মধ্যপন্থা", en: "Centrist / Social Capitalism", desc_bn: "চরমপন্থা এড়িয়ে ভারসাম্যপূর্ণ অবস্থান ও সামাজিক সুরক্ষার সমন্বয় চান।", desc_en: "Prefers a balanced approach, avoiding extremes and ensuring social protection." },
+            8: { bn: "বিপ্লবী বামপন্থা", en: "Revolutionary Left-Wing", desc_bn: "বিদ্যমান পুঁজিবাদী কাঠামো ভেঙে সমতাভিত্তিক সমাজ গঠন করতে চান।", desc_en: "Wants to dismantle the capitalist structure to form an egalitarian society." },
+            9: { bn: "নারীবাদী ব্লক", en: "Feminist Ideology", desc_bn: "নারীর পূর্ণ সমানাধিকার ও ক্ষমতায়নে প্রতিশ্রুতিবদ্ধ।", desc_en: "Committed to full equal rights and empowerment of women." },
+            10: { bn: "নিরপেক্ষ বাস্তববাদ", en: "Neutral / Pragmatist", desc_bn: "মতাদর্শহীন বাস্তবমুখী পরিস্থিতি-ভিত্তিক সিদ্ধান্ত নিতে আপনি পছন্দ করেন।", desc_en: "Prefers ideology-free, pragmatic, situation-based decision making." },
+            11: { bn: "ইসলামিক সমাজতন্ত্র", en: "Islamic Socialism", desc_bn: "ইসলামের সাম্য এবং সমাজতান্ত্রিক বণ্টন ব্যবস্থার মিশেলে আপনার মতাদর্শ।", desc_en: "Your ideology blends Islamic equality with socialist distribution." },
+            12: { bn: "মডার্নিস্ট ইসলামি আদর্শ", en: "Modernist Islamism", desc_bn: "ইসলামী মূল্যবোধ ও আধুনিক প্রগতির মেলবন্ধনে বিশ্বাসী।", desc_en: "Believes in blending Islamic values with modern progressivism." },
+            13: { bn: "রক্ষণশীল পুঁজিবাদ", en: "Conservative Capitalism", desc_bn: "মুক্তবাজার অর্থনীতি ও ঐতিহ্যগত সামাজিক মূল্যবোধ উভয়ের সমর্থনকারী।", desc_en: "Supports both a free-market economy and traditional social values." },
+            14: { bn: "প্রগতিশীল সমাজতন্ত্র", en: "Progressive Socialism", desc_bn: "সামাজিক সংস্কার ও অর্থনৈতিক সাম্যের মিলিত পথে হাঁটেন।", desc_en: "Walks the combined path of social reform and economic equality." },
+            15: { bn: "রক্ষণশীল সমাজতন্ত্র", en: "Conservative Socialism", desc_bn: "ঐতিহ্যগত মূল্যবোধ ও রাষ্ট্রীয় কল্যাণ ব্যবস্থার সমন্বয় চান।", desc_en: "Seeks a combination of traditional values and state welfare systems." },
+            16: { bn: "প্রগতিশীল পুঁজিবাদ", en: "Progressive Capitalism", desc_bn: "মুক্তবাজারের সাথে সামাজিক ন্যায়বিচারের মেলবন্ধন চান।", desc_en: "Wants a blend of free markets and social justice." },
+            17: { bn: "সাংঘর্ষিক ইসলামিক পুঁজিবাদ", en: "Contradictory Islamic Capitalism", desc_bn: "পুঁজিবাদী অর্থনীতি ও ইসলামী নীতির মিশ্রণের একটি জটিল চেষ্টা।", desc_en: "A complex attempt to mix capitalist economics with Islamic principles." },
+            18: { bn: "কর্পোরেট নারীবাদ", en: "Corporate Feminism", desc_bn: "পুঁজিবাদী কাঠামোর মধ্যে নারীর সমানাধিকার ও ক্ষমতায়নে বিশ্বাসী।", desc_en: "Believes in women's equality and empowerment within a capitalist framework." },
+            19: { bn: "ধর্মনিরপেক্ষ বামপন্থা", en: "Secular Leftism", desc_bn: "ধর্মনিরপেক্ষ রাষ্ট্র ও শ্রমজীবী মানুষের অধিকারের লড়াইয়ে বিশ্বাসী।", desc_en: "Believes in a secular state and the struggle for working-class rights." },
+            20: { bn: "বিভ্রান্তিকর বাস্তববাদ (সাংঘর্ষিক)", en: "Confused Pragmatism", desc_bn: "আপনার চিন্তায় সরাসরি সাংঘর্ষিক ও পরস্পরবিরোধী মতাদর্শের মিশ্রণ রয়েছে।", desc_en: "Your thoughts contain a mix of directly contradictory and opposing ideologies." }
+        };
+
+        let sortedCore = CATEGORIES.slice().sort((a,b) => finalScores[b] - finalScores[a]);
+        let top1 = sortedCore[0];
+        let top2 = sortedCore[1];
+        let gap = finalScores[top1] - finalScores[top2];
+        const has = (...cats) => cats.includes(top1) && cats.includes(top2);
+        
+        let matchedId = 10;
+        let isHybrid = gap < 15;
+
+        let isStrongIslamic = (userAnswers[3] === 0 && userAnswers[5] === 0);
+        let isStrictNeutral = isStrictPragmatist(userAnswers);
+
+        if (isStrictNeutral) {
+            matchedId = 10; 
+        } 
+        else if (checkForContradictions(userAnswers)) {
+            matchedId = 20;
+        } 
+        else if (isStrongIslamic) {
+            let dominantSecondary = (top1 === 'isl_law' || top1 === 'cons') ? top2 : top1;
+            if (dominantSecondary === 'soc' || dominantSecondary === 'left') matchedId = 11;
+            else if (dominantSecondary === 'prog' || dominantSecondary === 'fem') matchedId = 12;
+            else if (dominantSecondary === 'cap') matchedId = 17;
+            else matchedId = 5;
+        }
+        else if (isHybrid) {
+            if (has('isl_law', 'secular')) matchedId = 20; 
+            else if (has('isl_law', 'soc') || has('isl_law', 'left')) matchedId = 11;
+            else if (has('isl_law', 'prog') || has('isl_law', 'fem')) matchedId = 12;
+            else if (has('cap', 'cons')) matchedId = 13;
+            else if (has('soc', 'prog') || has('soc', 'fem') || has('left', 'prog') || has('left', 'fem')) matchedId = 14;
+            else if (has('soc', 'cons') || has('left', 'cons')) matchedId = 15;
+            else if (has('cap', 'prog') || has('cap', 'secular')) matchedId = 16;
+            else if (has('isl_law', 'cap')) matchedId = 17;
+            else if (has('cap', 'fem')) matchedId = 18;
+            else if (has('secular', 'left') || has('secular', 'soc')) matchedId = 19;
+            else {
+                let bestCat = top1;
+                if(bestCat === 'pragmatic') bestCat = top2;
+                
+                if (bestCat === 'isl_law') matchedId = 5;
+                else if (bestCat === 'secular') matchedId = 6;
+                else if (bestCat === 'cap') matchedId = 1;
+                else if (bestCat === 'cons') matchedId = 4;
+                else if (bestCat === 'left') matchedId = 8;
+                else if (bestCat === 'soc') matchedId = 2;
+                else if (bestCat === 'prog') matchedId = 3;
+                else if (bestCat === 'fem') matchedId = 9;
+                else matchedId = 7; 
+            }
+        } else {
+            let bestCat = top1;
+            if(bestCat === 'pragmatic') bestCat = top2;
+            
+            if (bestCat === 'isl_law') matchedId = 5;
+            else if (bestCat === 'secular') matchedId = 6;
+            else if (bestCat === 'cap') matchedId = 1;
+            else if (bestCat === 'cons') matchedId = 4;
+            else if (bestCat === 'left') matchedId = 8;
+            else if (bestCat === 'soc') matchedId = 2;
+            else if (bestCat === 'prog') matchedId = 3;
+            else if (bestCat === 'fem') matchedId = 9;
+            else matchedId = 7; 
+        }
+
+        let finalIdeologyObj = ALL_IDEOLOGIES[matchedId];
+        let ideology = lang === 'bn' ? finalIdeologyObj.bn : finalIdeologyObj.en;
+        let desc = lang === 'bn' ? finalIdeologyObj.desc_bn : finalIdeologyObj.desc_en;
+        
+        let tag = '';
+        if (matchedId === 20) tag = lang === 'bn' ? '⚠️ সাংঘর্ষিক মতাদর্শ' : '⚠️ Contradictory Ideology';
+        else if (matchedId > 10) tag = lang === 'bn' ? '🔀 হাইব্রিড মতাদর্শ' : '🔀 Hybrid Ideology';
+        else tag = lang === 'bn' ? '📌 বিশুদ্ধ মতাদর্শ' : '📌 Pure Ideology';
+
+        let name = document.getElementById('username').value.trim(); 
+
+        // -----------------------------------------------------
+        // --- GOOGLE APPS SCRIPT SUBMISSION CODE ADDED HERE ---
+        // -----------------------------------------------------
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbyG_7WwMCLVGK3y8s0QJoN65FoZu9Eqd5S3MY1lMfLphGmK-N7VuKT3EmBwcqxG_eUsCQ/exec';
+        let submitData = new FormData();
+        submitData.append('Name', name);
+        submitData.append('Ideology', ideology);
+        submitData.append('Language', lang);
+        submitData.append('Tag', tag);
+        
+        fetch(scriptURL, { method: 'POST', body: submitData, mode: 'no-cors' })
+            .then(res => console.log('Successfully submitted to App Script'))
+            .catch(err => console.error('Error in App Script submission:', err));
+        // -----------------------------------------------------
+
+        document.getElementById('quiz-section').style.display='none'; 
+        document.getElementById('result-section').style.display='block';
+        await new Promise(r => setTimeout(r, 1200));
+        document.getElementById('loading-area').style.display='none'; 
+        document.getElementById('result-area').style.display='block';
+        
+        let resTag = document.getElementById('res-tag'); 
+        resTag.innerText = tag; 
+        resTag.className = 'result-tag' + (matchedId > 10 ? ' hybrid' : ''); 
+        if(matchedId === 20) resTag.style.background = 'rgba(232, 59, 59, 0.2)', resTag.style.color = '#ff9e9e';
+        
+        document.getElementById('res-name').innerText = `${lang==='bn'?'অংশগ্রহণকারী':'Participant'}: ${name}`; 
+        document.getElementById('res-ideology').innerText = ideology; 
+        document.getElementById('res-desc').innerText = desc;
+
+        let podiumEl = document.getElementById('podium-area'); podiumEl.innerHTML=''; 
+        let podiumEmojis = ['🥇','🥈','🥉']; 
+        sortedCore.slice(0,3).forEach((c,i)=>{ 
+            let displayPct = Math.round((finalScores[c] / 250) * 100);
+            let item = document.createElement('div'); 
+            item.className = 'podium-item'+(i===0?' rank-1':''); 
+            item.innerHTML = `<div class="podium-rank">${podiumEmojis[i]}</div><div class="podium-name">${CAT_NAMES[lang][c]}</div><div class="podium-pct">${displayPct}%</div><div class="podium-bar" style="background:${BAR_COLORS[c]}; opacity:0.7;"></div>`; 
+            podiumEl.appendChild(item); 
+        });
+
+        let dimGroupsEl = document.getElementById('dim-groups-area'); dimGroupsEl.innerHTML=''; 
+        DIM_GROUPS.forEach(grp=>{ 
+            let grpDiv = document.createElement('div'); 
+            grpDiv.className = 'dim-group'; 
+            grpDiv.innerHTML = `<div class="dim-group-title">${lang==='bn'?grp.title_bn:grp.title_en}</div>`; 
+            grp.cats.forEach(c=>{ 
+                let relW = (finalScores[c] / 250) * 100; 
+                let displayPct = Math.round(relW); 
+                let row = document.createElement('div'); 
+                row.className = 'bar-row'; 
+                row.innerHTML = `<div class="bar-name">${CAT_NAMES[lang][c]}</div><div class="bar-track"><div class="bar-fill" id="bf-${c}" style="width:0%;background:${BAR_COLORS[c]};"></div></div><div class="bar-pct">${displayPct}%</div>`; 
+                grpDiv.appendChild(row); 
+                setTimeout(()=>{ let el = document.getElementById(`bf-${c}`); if(el) el.style.width = relW+'%'; }, 50); 
+            }); 
+            dimGroupsEl.appendChild(grpDiv); 
+        });
+
+        let interpEl = document.getElementById('interp-cards'); interpEl.innerHTML=''; 
+        sortedCore.slice(0,6).forEach(c=>{ 
+            let score = finalScores[c];
+            let displayPct = Math.round((score / 250) * 100);
+            let levelLabel = getLevelLabel(score, lang); 
+            let levelClass = getLevelClass(score); 
+            let isHigh = (score/250)*100 >= 45; 
+            let interpTxt = lang==='bn'?(isHigh?"এই মতাদর্শে আপনার দৃঢ় অবস্থান রয়েছে।":"এই মতাদর্শে আপনার আগ্রহ তুলনামূলক কম।"):(isHigh?"You have a strong stance.":"You have lower interest."); 
+            let card = document.createElement('div'); 
+            card.className = 'interp-card'; 
+            card.innerHTML = `<div class="interp-label">${CAT_NAMES[lang][c]}</div><div class="interp-val">${interpTxt}<br><span class="${levelClass}">${levelLabel} — ${displayPct}%</span></div>`; 
+            interpEl.appendChild(card); 
+        });
+
+        let scTagEl = document.getElementById('sc-tag'); 
+        if(scTagEl){ 
+            scTagEl.innerText = tag; 
+            scTagEl.style.background = matchedId > 10 ? 'rgba(232,162,59,0.2)':'rgba(59,112,232,0.2)'; 
+            scTagEl.style.color = matchedId > 10 ? '#ffda9e':'#9bc0ff'; 
+            if(matchedId === 20) scTagEl.style.background = 'rgba(232, 59, 59, 0.2)', scTagEl.style.color = '#ff9e9e';
+        }
+        document.getElementById('sc-name').innerText = `${lang==='bn'?'অংশগ্রহণকারী':'Participant'}: ${name}`; 
+        document.getElementById('sc-ideology').innerText = ideology; 
+        document.getElementById('sc-desc').innerText = desc;
+        let scTop3Div = document.getElementById('sc-top3'); scTop3Div.innerHTML=''; 
+        sortedCore.slice(0,3).forEach((c,i)=>{ 
+            let displayPct = Math.round((finalScores[c] / 250) * 100);
+            scTop3Div.innerHTML += `<div class="sc-top3-item${i===0?' first':''}"><div class="sc-top3-rank">${podiumEmojis[i]}</div><div class="sc-top3-name">${CAT_NAMES[lang][c]}</div><div class="sc-top3-pct">${displayPct}%</div></div>`; 
+        });
+        let scBarsDiv = document.getElementById('sc-bars'); scBarsDiv.innerHTML=''; 
+        sortedCore.slice(0,6).forEach(c=>{ 
+            let relW = (finalScores[c] / 250) * 100;
+            let displayPct = Math.round(relW);
+            scBarsDiv.innerHTML += `<div class="sc-bar-row"><div class="sc-bar-name">${CAT_NAMES[lang][c]}</div><div class="sc-bar-track"><div class="sc-bar-fill" style="width:${relW}%;background:${BAR_COLORS[c]};"></div></div><div class="sc-bar-pct">${displayPct}%</div></div>`; 
+        });
+    } catch(err) { 
+        console.error(err); 
+        alert(lang==='bn'?'ফলাফল বিশ্লেষণে ত্রুটি ঘটেছে।':'Analysis error.'); 
+        location.reload(); 
+    }
+}
+
+async function shareImage() { 
+    let btn = document.querySelector('.btn-share'); btn.disabled = true; btn.innerText = lang==='bn'?'⏳ তৈরি হচ্ছে...':'⏳ Generating...'; 
+    let src = document.getElementById('share-canvas-src'); src.style.position='absolute'; src.style.top='-99999px'; src.style.left='0px'; src.style.width='540px'; src.style.visibility='visible'; src.style.opacity='1'; src.style.zIndex='-1'; 
+    await new Promise(r=>setTimeout(r,300)); let contentH = src.scrollHeight; 
+    try { 
+        let canvas = await html2canvas(src,{scale:2,width:540,height:contentH,windowWidth:540,windowHeight:contentH,scrollX:0,scrollY:99999,backgroundColor:'#060c18',useCORS:true,logging:false}); 
+        src.style.visibility='hidden'; src.style.opacity='0'; src.style.position='absolute'; src.style.top='-99999px'; src.style.left='-99999px'; 
+        canvas.toBlob(async(blob)=>{ 
+            let file = new File([blob],'ideology_spectrum.png',{type:'image/png'}); 
+            if(navigator.canShare&&navigator.canShare({files:[file]})){ 
+                await navigator.share({files:[file],title:'Ideology Spectrum Result'}); 
+            } else { 
+                let a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'ideology_spectrum.png'; a.click(); 
+            } 
+            document.getElementById('share-status').innerText = lang==='bn'?'✅ ডাউনলোড সম্পন্ন!':'✅ Downloaded!'; 
+            btn.disabled = false; btn.innerText = '📸 Download Image (9:16)'; 
+        },'image/png'); 
+    } catch(e){ 
+        console.error(e); btn.disabled = false; btn.innerText = '📸 Download Image (9:16)'; 
+    } 
+}
+</script>
+</body>
+</html>
