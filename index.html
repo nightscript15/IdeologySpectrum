@@ -517,6 +517,20 @@
 </div>
 
 <script>
+// --- GOOGLE APPS SCRIPT URL ---
+// আপনার ডেপ্লয় করা নতুন Web App URL টি এখানে বসাবেন
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxQaHdxClGuvSnHnABOZjmijyMnLSzQLLV_MgmRGN6nTxL-KbSSuu77Kky1642rmRIl/exec";
+let userRowInSheet = null; 
+
+// পেজ লোড হওয়ার সাথে সাথেই লিংক ওপেন ট্র্যাকিং
+window.addEventListener('DOMContentLoaded', (event) => {
+    fetch(APPS_SCRIPT_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain" },
+        body: JSON.stringify({ action: "link_open" })
+    }).catch(err => console.error("Link track error:", err));
+});
+
 const CATEGORIES = ["cap", "soc", "prog", "cons", "isl_law", "secular", "cent", "left", "fem", "pragmatic"];
 
 const CAT_NAMES = { 
@@ -607,6 +621,21 @@ function startQuiz() {
     lang = document.getElementById('language').value; 
     if (!name) { alert(lang==='bn'?'অনুগ্রহ করে আপনার নাম লিখুন।':'Please enter your name.'); return; } 
 
+    // কুইজ স্টার্ট বাটনে ক্লিক করলেই ব্যাকগ্রাউন্ডে নাম শিটে চলে যাবে
+    fetch(APPS_SCRIPT_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain" },
+        body: JSON.stringify({ action: "start", name: name })
+    })
+    .then(res => res.json())
+    .then(resData => {
+        if(resData.row) {
+            userRowInSheet = resData.row;
+            console.log("Quiz started. Logged at row:", userRowInSheet);
+        }
+    })
+    .catch(err => console.error("Error logging start:", err));
+
     document.getElementById('login-section').style.display = 'none'; 
     document.getElementById('quiz-section').style.display = 'block'; 
     qIdx = 0; 
@@ -670,9 +699,6 @@ function getLevelClass(score) {
     return 'level-minimal'; 
 }
 
-// -------------------------------------------------------
-// CONTRADICTION CHECKER 
-// -------------------------------------------------------
 function checkForContradictions(answers) {
     const SA = (q) => answers[q] === 0;   
     const SD = (q) => answers[q] === 4;   
@@ -696,15 +722,10 @@ function checkForContradictions(answers) {
     return false;
 }
 
-// -------------------------------------------------------
-// STRICT PRAGMATIST CHECKER (ID: 10)
-// -------------------------------------------------------
 function isStrictPragmatist(answers) {
-    // Check if 1 to 24 (index 0 to 23) are all Neutral (index 2)
     for (let i = 0; i < 24; i++) {
         if (answers[i] !== 2) return false;
     }
-    // Check if 25 (index 24) is SA(0), A(1), or N(2)
     return (answers[24] === 0 || answers[24] === 1 || answers[24] === 2);
 }
 
@@ -828,22 +849,19 @@ async function calcResult() {
         // -----------------------------------------------------
         // --- GOOGLE APPS SCRIPT SUBMISSION CODE ADDED HERE ---
         // -----------------------------------------------------
-        const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxJYH47yDHxXuWlTu4OUo0eshSWh4ljHtZK5nWlhM7LIpWZ87gPj0by8pFdXAljJ7dv6A/exec";
-
-        // শীর্ষ ৩ মতাদর্শের নাম ও % এক লাইনে টেক্সট হিসেবে সাজানো
         let top3String = sortedCore.slice(0,3).map(c => {
             let displayPct = Math.round((finalScores[c] / 250) * 100);
             return `${CAT_NAMES[lang][c]} (${displayPct}%)`;
         }).join(", ");
 
-        // গুগল শিটের হেডারের (Name, Ideology, Top3) সাথে হুবহু মিলিয়ে ছোট হাতের অক্ষরে পে-লোড তৈরি
         let payload = {
-            name: name,
+            action: "analyze",
+            row: userRowInSheet,
+            name: name, // ফলব্যাকের জন্য নামটাও দেওয়া হলো
             ideology: ideology,
             top3: top3String
         };
 
-        // ডাটা সাবমিট করার নতুন ও ফিক্সড মেথড (CORS ব্লক এড়াতে text/plain ব্যবহার করা হয়েছে)
         fetch(APPS_SCRIPT_URL, {
             method: "POST",
             headers: { "Content-Type": "text/plain" },
@@ -852,7 +870,6 @@ async function calcResult() {
         .then(res => res.json())
         .then(resData => console.log("Success:", resData))
         .catch(err => console.error("Error sending data:", err));
-        // ---------------------------------
         // -----------------------------------------------------
 
         document.getElementById('quiz-section').style.display='none'; 
